@@ -1,0 +1,33 @@
+# Incident Report: Compromised Microsoft Teams Account & StudentAid.gov Abuse
+**Date:** September 9, 2026  
+**Analyst:** Shanlle Moore  
+**Status:** Closed / Mitigated  
+
+## 1. Summary of the Incident
+While looking for remote data entry positions, I interacted with a Microsoft Teams account that appeared to belong to a real HR employee at Triton Glass LLC. The account was fully verified and matched the company's real web directory, suggesting the employee's corporate Microsoft 365 account had been compromised by an outside attacker. 
+
+The attacker tried to run a standard eCheck equipment scam, by informing me they do not use the proper forms of payment to receive money for the equipment. When I pushed back based on my computer specs, they immediately shifted tactics and sent a real identity verification link from a government domain to try to steal my biometric data. 
+
+## 2. Technical Timeline & Observations
+*   **Initial Contact:** The conversation occurred through messaging on the job board called Monster showing interest and saying they felt I would be a good fit with a link to a compromised employee's corporate Microsoft 365 account. 
+
+*   **The First Trap:** The user offered to send an electronic check to buy office equipment before training started. I told the user I already owned a high-end workstation (HP ZBook mobile workstation), which disrupted their script. Causing them to switch tactics on how to go further with the attack. 
+
+*   **The Second Trap:** The user quickly changed their story and sent a direct link: `accountrecovery.studentaid.gov/SCHejXFm7yX`. In an attempts to trick the me into providing documentation through compromised channels cloaked to like proper channels. 
+
+*   **The Routing Mechanism:** The link contained a live session token (`/SCHejXFm7yX`) tied to a federal student aid account. The attacker was trying to recover an account using my identity metrics. If I completed the live face scan and ID upload on the real government site, the portal would have unlocked a session for the attacker. 
+
+*   **The Tracking Script:** The link also utilized an internal tracking and device-fingerprinting domain script (`://trustev.com`). The attacker repeatedly pressured me to open the link on my mobile phone instead of a computer to make the URL modifications harder to spot.
+
+## 3. Sandbox Testing & Mitigation
+I extracted the raw internal Teams deep-link code from the chat thread: `://live.com...` to isolate the specific network thread ID. [ https://teams.live.com/l/message/19:uni01_p42ykcg6dngbcpa6yqzwrn3rbqyqmfnnut4sbeq533katqiyo4ma@thread.v2/1788798602031?context=%7B%22contextType%22%3A%22chat%22%7DI ]
+
+I then performed a hard block on the attacker's profile inside the Microsoft Teams application to terminate the communication path. 
+
+To verify the containment, I loaded up an isolated Virtual Machine (VM) sandbox, logged into my Teams account inside the secure container, and pasted the real URL. The browser threw an access-denied error due to the active block rule and safely routed the traffic out of the thread into a basic Google search loop, confirming that the attacker's tracking token was fully neutralized.
+
+## 4. Indicators of Compromise (IoCs)
+*   **Compromised Enterprise Tenant:** Triton Glass LLC (`@tritonglassllc.online`)
+*   **Abused Identity Portal:** `accountrecovery.studentaid.gov`
+*   **Session Token:** `/SCHejXFm7yX`
+*   **Device Fingerprinter:** `://trustev.com`
